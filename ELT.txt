@@ -1,0 +1,44 @@
+Task: Build an ELT pipeline for Titanic data
+Scenario
+“You are a data engineer. Your manager says: Don’t clean the data in Python. Load the raw data into MySQL first, then do all the cleaning and analysis inside the database using SQL.”
+This is the main difference from ETL: the transform happens inside the database, after loading.
+Rules
+Python is allowed only for Extract and Load and for running SQL files.
+All cleaning and transformation must be written in SQL.
+Raw data must never be changed. Always keep it safe.
+Part 1: Extract and Load (Python)
+Load the Titanic dataset using seaborn.
+Load it into MySQL table raw_titanic exactly as it is. Keep all nulls and all columns.
+Add two extra columns: load_timestamp and batch_id.
+If you run the script two times, the table must not get duplicate rows. (Hint: think about if_exists or truncate before load.)
+Part 2: Staging layer (SQL)
+Create stg_titanic from the raw table:
+Rename columns to clear names (example: pclass → passenger_class).
+Convert text to the same case (lowercase or proper case).
+Cast columns to correct data types.
+Part 3: Transformation layer (SQL)
+Create clean_passengers from the staging table:
+Fill missing age using the average age of the same class and same sex.
+Fill missing embarked with the most common value.
+Remove deck and embark_town.
+Encode sex as 0 and 1.
+Create age_group: Child (0–12), Teen (13–19), Adult (20–59), Senior (60+).
+Create family_size = sibsp + parch + 1, and is_alone (1 or 0).
+Create fare_category (Low, Medium, High, Premium) using NTILE(4).
+Part 4: Analytics layer (SQL)
+Create three views:
+Survival rate by class and sex
+Survival rate by age group
+Top 3 highest fares in each class (use RANK() or ROW_NUMBER())
+Part 5: Data quality checks (SQL)
+Write checks and save the results in a table dq_results (columns: check_name, status, checked_at):
+Row count of raw_titanic = row count of clean_passengers
+No nulls in age, embarked
+No duplicate passengers
+Age is between 0 and 100
+sex has only 0 or 1
+Part 6: Automation
+Write run_elt.py that:
+Runs the extract and load
+Runs the SQL files in order
+Prints “PASS” or “FAIL” for each quality check
